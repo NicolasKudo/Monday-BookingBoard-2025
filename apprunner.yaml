@@ -1,8 +1,8 @@
 version: 1.0
-runtime: python3 
+runtime: python3
 build:
   commands:
     build:
       - pip install --no-cache-dir -r requirements.txt
-run: 
+run:
   command: gunicorn -b 0.0.0.0:8080 --timeout 300 --workers 1 --preload main:app
