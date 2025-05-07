@@ -1,5 +1,5 @@
 # Usa una imagen más liviana para reducir tamaño y tiempos de despliegue
-FROM python:3.11-slim
+FROM python:3.11
 
 # Establece el directorio de trabajo en el contenedor
 WORKDIR /app
