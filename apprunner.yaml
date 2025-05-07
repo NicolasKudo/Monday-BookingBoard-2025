@@ -3,6 +3,6 @@ runtime: python3
 build:
   commands:
     build:
-      - ppip install --no-cache-dir -r requirements.txt
+      - pip install --no-cache-dir -r requirements.txt
 run: 
   command: gunicorn -b 0.0.0.0:8080 --timeout 300 --workers 1 --preload main:app
