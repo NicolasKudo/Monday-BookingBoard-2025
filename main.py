@@ -33,6 +33,8 @@ BOOKING_BOARD_ID = os.getenv("BOOKING_BOARD_NUMBER",8883743273)
 SUB_BOOKING_BOARD_ID = os.getenv("SUB_BOOKING_BOARD_ID","group_title")
 BUCKET_NAME = os.getenv("BUCKET_NAME","monday-booking-boards")
 STORED_VARIABLES_SUB_FOLDER = os.getenv("STORED_VARIABLES_SUB_FOLDER","stored_variables")
+OUTPUT_FILE_NAME = os.getenv("OUTPUT_FILE_NAME","bookings_ps_df_2025")
+OUTPUT_FILE_NAME_LAST_UPDATE = os.getenv("OUTPUT_FILE_NAME","bookings_ps_items_last_update_stored_2025")
 
 ##################################################################################################
 ### 3) MONDAY & AWS-S3 CLIENTS
@@ -97,10 +99,6 @@ def fetch_all_items(board_number, sub_board_id):
 
     # Convertir los datos a DataFrame
     return pd.DataFrame(all_items)
-
-
-import requests
-import pandas as pd
 
 def query_monday_graphql_paginated_with_subitems(board_number, sub_board_id, cursor=None):
     """Realiza una consulta GraphQL a monday.com para obtener subitems con paginación."""
@@ -216,7 +214,7 @@ def run_etl():
         bookings_ps_items_last_update_stored = safe_read_latest_version(
         bucket="monday-booking-boards",
         prefix="stored_variables/",
-        base_filename="bookings_ps_items_last_update_stored"
+        base_filename=OUTPUT_FILE_NAME_LAST_UPDATE
         )
         
         if bookings_ps_items_last_update_stored.empty:
@@ -245,7 +243,7 @@ def run_etl():
         bookings_ps_df = safe_read_latest_version(
             bucket="monday-booking-boards",
             prefix="stored_variables/",
-            base_filename="bookings_ps_df"
+            base_filename=OUTPUT_FILE_NAME
         )
         
         if bookings_ps_df.empty:
@@ -349,12 +347,12 @@ def run_etl():
         
         bookings_ps_items_last_update_stored = bookings_ps_df[['id','updated_at']].copy()
         
-        storing_stored_variables_s3(bookings_ps_items_last_update_stored, "bookings_ps_items_last_update_stored")
+        storing_stored_variables_s3(bookings_ps_items_last_update_stored, OUTPUT_FILE_NAME_LAST_UPDATE )
         
         duplicated_columns_2 = bookings_ps_df.columns.value_counts()[bookings_ps_df.columns.value_counts()>1].index.to_list()
         bookings_ps_df = bookings_ps_df.drop(duplicated_columns_2,axis=1)
         
-        storing_stored_variables_s3(bookings_ps_df, "bookings_ps_df")
+        storing_stored_variables_s3(bookings_ps_df, OUTPUT_FILE_NAME)
     
         return jsonify({
             'status': 'Monday Booking Board - ETL Completed',
