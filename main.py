@@ -351,6 +351,28 @@ def run_etl():
         
         duplicated_columns_2 = bookings_ps_df.columns.value_counts()[bookings_ps_df.columns.value_counts()>1].index.to_list()
         bookings_ps_df = bookings_ps_df.drop(duplicated_columns_2,axis=1)
+
+        cols_to_keep = [
+            'casesafe_id',
+            '*Meeting Date',
+            '*Live time - 24h',
+            '(Tableau Start)',
+            'Real end time (after meeting) 24h',
+            'Scheduled end time',
+            '*Which bundle to deduct hours from',
+            'Booking/meeting Progress',
+            '*Main meeting platform',
+            'Which product',
+            'Operators',
+            'Ingestor',
+            'Adv. Eng. / Consultant',
+            '*Meeting Languages (human)',
+            'KUDO Meeting Links',
+            'booking_reason',
+            'Extra PS/Support Credits hours to charge'
+        ]
+        
+        bookings_ps_df = bookings_ps_df[cols_to_keep].copy()
         
         storing_stored_variables_s3(bookings_ps_df, OUTPUT_FILE_NAME)
     
